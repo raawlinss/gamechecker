@@ -1,79 +1,63 @@
-<!doctype html>
-Mod
-<select id="aiMode" class="bg-white/10 text-white rounded-full px-3 py-1.5 focus:outline-none">
-<option value="off" selected>Kapalı (Yerel)</option>
-<option value="auto">AI Otomatik (PCGW + Wikipedia)</option>
-</select>
-</label>
-<span class="text-[11px] text-white/50">Ücretsiz kaynaklardan otomatik doldurma</span>
-</div>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rawlins</title>
 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans']
+          }
+        }
+      }
+    }
+  </script>
 
-<section id="resultWrap" class="hidden mt-6">
-<div class="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 backdrop-blur">
-<div class="flex items-center justify-between gap-3">
-<h2 id="gameTitle" class="text-lg sm:text-xl font-semibold">Oyun</h2>
-<div class="flex items-center gap-2">
-<a id="sourceLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 text-white/80 hover:text-white">Kaynak</a>
-<span id="resultBadge" class="text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 text-white/80">Yerel</span>
-</div>
-</div>
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-black text-white font-sans">
+  <main class="min-h-screen w-full flex items-center justify-center p-6">
+    <section class="w-full max-w-2xl">
+      <h1 class="text-white/90 tracking-[0.35em] uppercase text-sm sm:text-base font-semibold select-none text-center">
+        rawlins
+      </h1>
 
+      <div class="mt-10">
+        <label for="search" class="sr-only">Ara</label>
+        <div class="relative">
+          <!-- Arama ikonu -->
+          <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M21 21l-4.2-4.2m1.2-5A7 7 0 1 1 7 5a7 7 0 0 1 11 6.8Z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
 
-<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-<div class="rounded-xl bg-white/5 border border-white/10 p-3">
-<div class="text-xs text-white/60 mb-1">Din/Mitoloji Teması</div>
-<div id="fieldReligion" class="font-semibold">—</div>
-</div>
-<div class="rounded-xl bg-white/5 border border-white/10 p-3">
-<div class="text-xs text-white/60 mb-1">Çok Oyunculu</div>
-<div id="fieldMultiplayer" class="font-semibold">—</div>
-</div>
-<div class="rounded-xl bg-white/5 border border-white/10 p-3">
-<div class="text-xs text-white/60 mb-1">Oyuncu Sayısı</div>
-<div id="fieldPlayers" class="font-semibold">—</div>
-</div>
-<div class="rounded-xl bg-white/5 border border-white/10 p-3">
-<div class="text-xs text-white/60 mb-1">Ana Hikâye (saat)</div>
-<div id="fieldMain" class="font-semibold">—</div>
-</div>
-<div class="rounded-xl bg-white/5 border border-white/10 p-3">
-<div class="text-xs text-white/60 mb-1">PS Klavye/Mouse</div>
-<div id="fieldKM" class="font-semibold">Bilinmiyor</div>
-</div>
-<div class="rounded-xl bg-white/5 border border-white/10 p-3">
-<div class="text-xs text-white/60 mb-1">Cross-Platform</div>
-<div id="fieldCross" class="font-semibold">—</div>
-</div>
-<div class="rounded-xl bg-white/5 border border-white/10 p-3 sm:col-span-2">
-<div class="text-xs text-white/60 mb-1">Çıkış / Planlanan Tarih</div>
-<div id="fieldRelease" class="font-semibold">—</div>
-</div>
-</div>
+          <!-- Beyaz arama çubuğu -->
+          <input
+            id="search"
+            type="search"
+            inputmode="search"
+            autocomplete="off"
+            placeholder="Ara..."
+            class="w-full bg-white text-gray-900 placeholder-gray-500 rounded-full py-4 pl-12 pr-4 shadow-xl focus:outline-none focus:ring-4 focus:ring-white/30 transition"
+          />
+        </div>
+      </div>
+    </section>
+  </main>
 
-
-<div id="aiSources" class="mt-4 hidden text-[11px] text-white/70 flex flex-wrap gap-2"></div>
-
-
-<p id="resultNote" class="mt-4 text-xs text-white/50 leading-relaxed">Not: Yerel veri anında; AI Otomatik açıkken PCGamingWiki + Wikipedia’dan bilgiler kısa süre içinde tamamlanır (doğruluk garanti edilmez).</p>
-</div>
-</section>
-
-
-<section id="notFound" class="hidden mt-6">
-<div class="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 text-white/80">Sonuç bulunamadı. Yazımı kontrol edin veya data bölümüne ekleyin.</div>
-</section>
-
-
-<div id="statusMsg" class="hidden mt-3 text-xs text-white/60"></div>
-</div>
-</main>
-
-
-<noscript class="p-4 text-center">Bu sayfa JavaScript gerektirir — lütfen tarayıcı ayarlarından JavaScript'i etkinleştirin.</noscript>
-
-
-<!-- Uygulama mantığı -->
-<script defer src="script.js"></script>
-</body>
+  <script>
+    // Bilerek herhangi bir işlem tetiklemiyoruz; sade bir görünüm istenmişti.
+    // Burada form yok, böylece Enter'a basınca sayfa yönlenmez.
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'982a10fa500d588e',t:'MTc1ODQ2Mjk5MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
