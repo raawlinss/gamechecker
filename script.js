@@ -1,3 +1,8 @@
+      <!-- Sonuçlar -->
+      <div id="results" class="mt-8 space-y-4"></div>
+    </section>
+  </main>
+
 <script>
     // Basit, yerel oyun verileri (örnek). İstersen daha fazla oyun ekleyebilirsin.
     const games = [
