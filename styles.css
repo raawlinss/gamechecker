@@ -1,0 +1,5 @@
+/* Küçük yerel dokunuşlar */
+.search-shadow { box-shadow: 0 10px 30px -10px rgba(255,255,255,0.30); }
+
+
+/* Eğer isterseniz buraya proje-spesifik (non-Tailwind) stiller ekleyin */
