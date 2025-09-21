@@ -1,597 +1,79 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <!-- ========== index.html · head ========== -->
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>rawlins · Oyun Arama (v4 · Geniş Liste)</title>
+<!doctype html>
+Mod
+<select id="aiMode" class="bg-white/10 text-white rounded-full px-3 py-1.5 focus:outline-none">
+<option value="off" selected>Kapalı (Yerel)</option>
+<option value="auto">AI Otomatik (PCGW + Wikipedia)</option>
+</select>
+</label>
+<span class="text-[11px] text-white/50">Ücretsiz kaynaklardan otomatik doldurma</span>
+</div>
 
-  <!-- ========== style.css (Tailwind yükleyici) ========== -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    // Tailwind temel ayar (temiz tipografi)
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Apple Color Emoji', 'Segoe UI Emoji'],
-          }
-        }
-      }
-    }
-  </script>
 
-  <!-- (İsteğe bağlı) Google Font ön bağlantıları -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<section id="resultWrap" class="hidden mt-6">
+<div class="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 backdrop-blur">
+<div class="flex items-center justify-between gap-3">
+<h2 id="gameTitle" class="text-lg sm:text-xl font-semibold">Oyun</h2>
+<div class="flex items-center gap-2">
+<a id="sourceLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 text-white/80 hover:text-white">Kaynak</a>
+<span id="resultBadge" class="text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 text-white/80">Yerel</span>
+</div>
+</div>
 
-  <!-- ========== style.css (özel ufak dokunuşlar) ========== -->
-  <style>
-    .search-shadow { box-shadow: 0 10px 30px -10px rgba(255,255,255,0.30); }
-  </style>
-</head>
-<body class="bg-black text-white font-sans antialiased min-h-screen">
-  <!-- ========== index.html · header ========== -->
-  <header class="w-full py-6 text-center">
-    <div class="text-white/90 tracking-[0.35em] uppercase text-sm sm:text-base font-semibold select-none">
-      rawlins
-    </div>
-  </header>
 
-  <!-- ========== index.html · main ========== -->
-  <main class="min-h-[calc(100vh-96px)] grid place-items-center px-4">
-    <div class="w-full max-w-2xl">
-      <!-- Arama alanı -->
-      <form id="searchForm" class="relative">
-        <input
-          id="searchInput"
-          type="search"
-          autocomplete="off"
-          placeholder="Oyun ismi yazın…"
-          class="w-full h-14 sm:h-16 rounded-full bg-white text-black placeholder-black/50 px-6 pr-14 outline-none ring-0 focus:ring-4 focus:ring-white/20 transition search-shadow"
-          aria-label="Oyun arama"
-        />
-        <button
-          type="submit"
-          class="absolute right-2 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-black text-white hover:bg-white hover:text-black transition grid place-items-center"
-          aria-label="Ara">
-          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="11" cy="11" r="7"></circle>
-            <path d="M20 20l-3.5-3.5"></path>
-          </svg>
-        </button>
+<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div class="rounded-xl bg-white/5 border border-white/10 p-3">
+<div class="text-xs text-white/60 mb-1">Din/Mitoloji Teması</div>
+<div id="fieldReligion" class="font-semibold">—</div>
+</div>
+<div class="rounded-xl bg-white/5 border border-white/10 p-3">
+<div class="text-xs text-white/60 mb-1">Çok Oyunculu</div>
+<div id="fieldMultiplayer" class="font-semibold">—</div>
+</div>
+<div class="rounded-xl bg-white/5 border border-white/10 p-3">
+<div class="text-xs text-white/60 mb-1">Oyuncu Sayısı</div>
+<div id="fieldPlayers" class="font-semibold">—</div>
+</div>
+<div class="rounded-xl bg-white/5 border border-white/10 p-3">
+<div class="text-xs text-white/60 mb-1">Ana Hikâye (saat)</div>
+<div id="fieldMain" class="font-semibold">—</div>
+</div>
+<div class="rounded-xl bg-white/5 border border-white/10 p-3">
+<div class="text-xs text-white/60 mb-1">PS Klavye/Mouse</div>
+<div id="fieldKM" class="font-semibold">Bilinmiyor</div>
+</div>
+<div class="rounded-xl bg-white/5 border border-white/10 p-3">
+<div class="text-xs text-white/60 mb-1">Cross-Platform</div>
+<div id="fieldCross" class="font-semibold">—</div>
+</div>
+<div class="rounded-xl bg-white/5 border border-white/10 p-3 sm:col-span-2">
+<div class="text-xs text-white/60 mb-1">Çıkış / Planlanan Tarih</div>
+<div id="fieldRelease" class="font-semibold">—</div>
+</div>
+</div>
 
-        <!-- Öneriler (yazdıkça doldurulur) -->
-        <div id="suggestions" class="hidden absolute left-0 right-0 mt-2 rounded-2xl bg-white text-black shadow-2xl overflow-hidden z-20"></div>
-      </form>
 
-      <!-- Arama altı: AI modu -->
-      <div class="mt-3 flex items-center justify-between">
-        <label class="inline-flex items-center gap-2 text-xs sm:text-sm text-white/80">
-          Mod
-          <select id="aiMode" class="bg-white/10 text-white rounded-full px-3 py-1.5 focus:outline-none">
-            <option value="off" selected>Kapalı (Yerel)</option>
-            <option value="auto">AI Otomatik (PCGW + Wikipedia)</option>
-          </select>
-        </label>
-        <span class="text-[11px] text-white/50">Ücretsiz kaynaklardan otomatik doldurma</span>
-      </div>
+<div id="aiSources" class="mt-4 hidden text-[11px] text-white/70 flex flex-wrap gap-2"></div>
 
-      <!-- Sonuç kartı -->
-      <section id="resultWrap" class="hidden mt-6">
-        <div class="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 backdrop-blur">
-          <div class="flex items-center justify-between gap-3">
-            <h2 id="gameTitle" class="text-lg sm:text-xl font-semibold">Oyun</h2>
-            <div class="flex items-center gap-2">
-              <a id="sourceLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 text-white/80 hover:text-white">Kaynak</a>
-              <span id="resultBadge" class="text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 text-white/80">Yerel</span>
-            </div>
-          </div>
 
-          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
-              <div class="text-xs text-white/60 mb-1">Din/Mitoloji Teması</div>
-              <div id="fieldReligion" class="font-semibold">—</div>
-            </div>
-            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
-              <div class="text-xs text-white/60 mb-1">Çok Oyunculu</div>
-              <div id="fieldMultiplayer" class="font-semibold">—</div>
-            </div>
-            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
-              <div class="text-xs text-white/60 mb-1">Oyuncu Sayısı</div>
-              <div id="fieldPlayers" class="font-semibold">—</div>
-            </div>
-            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
-              <div class="text-xs text-white/60 mb-1">Ana Hikâye (saat)</div>
-              <div id="fieldMain" class="font-semibold">—</div>
-            </div>
-            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
-              <div class="text-xs text-white/60 mb-1">PS Klavye/Mouse</div>
-              <div id="fieldKM" class="font-semibold">Bilinmiyor</div>
-            </div>
-            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
-              <div class="text-xs text-white/60 mb-1">Cross-Platform</div>
-              <div id="fieldCross" class="font-semibold">—</div>
-            </div>
-            <div class="rounded-xl bg-white/5 border border-white/10 p-3 sm:col-span-2">
-              <div class="text-xs text-white/60 mb-1">Çıkış / Planlanan Tarih</div>
-              <div id="fieldRelease" class="font-semibold">—</div>
-            </div>
-          </div>
+<p id="resultNote" class="mt-4 text-xs text-white/50 leading-relaxed">Not: Yerel veri anında; AI Otomatik açıkken PCGamingWiki + Wikipedia’dan bilgiler kısa süre içinde tamamlanır (doğruluk garanti edilmez).</p>
+</div>
+</section>
 
-          <!-- Kaynak rozetleri -->
-          <div id="aiSources" class="mt-4 hidden text-[11px] text-white/70 flex flex-wrap gap-2"></div>
 
-          <p id="resultNote" class="mt-4 text-xs text-white/50 leading-relaxed">
-            Not: Yerel veri anında; AI Otomatik açıkken PCGamingWiki + Wikipedia’dan bilgiler kısa süre içinde tamamlanır (doğruluk garanti edilmez).
-          </p>
-        </div>
-      </section>
+<section id="notFound" class="hidden mt-6">
+<div class="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 text-white/80">Sonuç bulunamadı. Yazımı kontrol edin veya data bölümüne ekleyin.</div>
+</section>
 
-      <!-- Bulunamadı -->
-      <section id="notFound" class="hidden mt-6">
-        <div class="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 text-white/80">
-          Sonuç bulunamadı. Yazımı kontrol edin veya data.json bölümüne ekleyin.
-        </div>
-      </section>
 
-      <!-- Durum -->
-      <div id="statusMsg" class="hidden mt-3 text-xs text-white/60"></div>
-    </div>
-  </main>
+<div id="statusMsg" class="hidden mt-3 text-xs text-white/60"></div>
+</div>
+</main>
 
-  <!-- ========== data.json (Geniş yerel oyun listesi) ========== -->
-  <!-- İsterseniz buraya oyun ekleyip/silebilirsiniz. Sadece name ve release (opsiyonel) yeterli. -->
-  <script id="local-games" type="application/json">
-  [
-    { "id": "minecraft", "name": "Minecraft", "religion": "Hayır", "multiplayer": true,  "players": "Değişken",         "mainStory": "—",   "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2011" },
-    { "id": "among-us", "name": "Among Us", "religion": "Hayır", "multiplayer": true, "players": "4–15", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2018" },
-    { "id": "witcher3", "name": "The Witcher 3: Wild Hunt", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "50+", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2015" },
-    { "id": "elden-ring", "name": "Elden Ring", "religion": "Evet", "multiplayer": true, "players": "2–4 (eşli)", "mainStory": "50+", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Bilinmiyor", "release": "2022" },
-    { "id": "gtav", "name": "Grand Theft Auto V", "religion": "Hayır", "multiplayer": true, "players": "30 (Online)", "mainStory": "31–35", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2013" },
-    { "id": "rdr2", "name": "Red Dead Redemption 2", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "50+", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2018" },
-    { "id": "cyberpunk-2077", "name": "Cyberpunk 2077", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "25–30", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2020" },
-    { "id": "fortnite", "name": "Fortnite", "religion": "Hayır", "multiplayer": true, "players": "100", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2017" },
-    { "id": "apex-legends", "name": "Apex Legends", "religion": "Hayır", "multiplayer": true, "players": "60", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2019" },
-    { "id": "valorant", "name": "Valorant", "religion": "Hayır", "multiplayer": true, "players": "5v5", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2020" },
-    { "id": "league-of-legends", "name": "League of Legends", "religion": "Hayır", "multiplayer": true, "players": "5v5", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2009" },
-    { "id": "dota-2", "name": "Dota 2", "religion": "Hayır", "multiplayer": true, "players": "5v5", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2013" },
-    { "id": "cs2", "name": "Counter-Strike 2", "religion": "Hayır", "multiplayer": true, "players": "5v5", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2023" },
-    { "id": "overwatch-2", "name": "Overwatch 2", "religion": "Hayır", "multiplayer": true, "players": "5v5", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2022" },
-    { "id": "warzone", "name": "Call of Duty: Warzone", "religion": "Hayır", "multiplayer": true, "players": "100+", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2020" },
-    { "id": "pubg", "name": "PUBG: Battlegrounds", "religion": "Hayır", "multiplayer": true, "players": "100", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2017" },
-    { "id": "rocket-league", "name": "Rocket League", "religion": "Hayır", "multiplayer": true, "players": "1–4 (takım)", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2015" },
-    { "id": "fall-guys", "name": "Fall Guys", "religion": "Hayır", "multiplayer": true, "players": "60", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2020" },
-    { "id": "genshin-impact", "name": "Genshin Impact", "religion": "Evet", "multiplayer": true, "players": "Co-op 4", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2020" },
-    { "id": "hades", "name": "Hades", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "20–25", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2020" },
-    { "id": "hades-ii", "name": "Hades II", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Bilinmiyor", "release": "2024 (EA)" },
-    { "id": "baldurs-gate-3", "name": "Baldur's Gate 3", "religion": "Evet", "multiplayer": true, "players": "Co-op 4", "mainStory": "50+", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2023" },
-    { "id": "starfield", "name": "Starfield", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "30–40", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2023" },
-    { "id": "skyrim", "name": "The Elder Scrolls V: Skyrim", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "30+", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2011" },
-    { "id": "tes-vi", "name": "The Elder Scrolls VI", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Bilinmiyor", "release": "Planlanan: 2026?" },
-    { "id": "gta-vi", "name": "Grand Theft Auto VI", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Bilinmiyor", "release": "2025 (beklenen)" },
-    { "id": "hogwarts-legacy", "name": "Hogwarts Legacy", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "25–35", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2023" },
-    { "id": "assassins-creed-valhalla", "name": "Assassin's Creed Valhalla", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "50+", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2020" },
-    { "id": "ac-mirage", "name": "Assassin's Creed Mirage", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "15–20", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2023" },
-    { "id": "ghost-of-tsushima", "name": "Ghost of Tsushima", "religion": "Hayır", "multiplayer": true, "players": "Co-op 2–4", "mainStory": "25–35", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2020" },
-    { "id": "god-of-war", "name": "God of War (2018)", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "20–25", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2018" },
-    { "id": "gow-ragnarok", "name": "God of War Ragnarök", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "25–35", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2022" },
-    { "id": "horizon-zero-dawn", "name": "Horizon Zero Dawn", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "20–25", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2017" },
-    { "id": "horizon-forbidden-west", "name": "Horizon Forbidden West", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "25–35", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2022" },
-    { "id": "spider-man", "name": "Marvel's Spider-Man", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "15–20", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2018" },
-    { "id": "spider-man-2", "name": "Marvel's Spider-Man 2", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "17–25", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2023" },
-    { "id": "last-of-us", "name": "The Last of Us Part I", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "15–20", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2013/2022" },
-    { "id": "last-of-us-2", "name": "The Last of Us Part II", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "20–25", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2020" },
-    { "id": "bloodborne", "name": "Bloodborne", "religion": "Evet", "multiplayer": true, "players": "Co-op", "mainStory": "30–40", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2015" },
-    { "id": "sekiro", "name": "Sekiro: Shadows Die Twice", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "25–35", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2019" },
-    { "id": "dark-souls-3", "name": "Dark Souls III", "religion": "Evet", "multiplayer": true, "players": "Co-op/PvP", "mainStory": "30–40", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2016" },
-    { "id": "cuphead", "name": "Cuphead", "religion": "Hayır", "multiplayer": true, "players": "2", "mainStory": "10–12", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2017" },
-    { "id": "hollow-knight", "name": "Hollow Knight", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "20–30", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2017" },
-    { "id": "silksong", "name": "Hollow Knight: Silksong", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Bilinmiyor", "release": "TBA" },
-    { "id": "stardew-valley", "name": "Stardew Valley", "religion": "Hayır", "multiplayer": true, "players": "Co-op 4", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2016" },
-    { "id": "terraria", "name": "Terraria", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2011" },
-    { "id": "factorio", "name": "Factorio", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2020" },
-    { "id": "satisfactory", "name": "Satisfactory", "religion": "Hayır", "multiplayer": true, "players": "Co-op", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2019 (EA)" },
-    { "id": "rimworld", "name": "RimWorld", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2018" },
-    { "id": "cities-skylines", "name": "Cities: Skylines", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2015" },
-    { "id": "cities-skylines-ii", "name": "Cities: Skylines II", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2023" },
-    { "id": "civilization-vi", "name": "Sid Meier's Civilization VI", "religion": "Evet", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2016" },
-    { "id": "age-of-empires-iv", "name": "Age of Empires IV", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2021" },
-    { "id": "starcraft-ii", "name": "StarCraft II", "religion": "Hayır", "multiplayer": true, "players": "1v1/2v2/3v3/4v4", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2010" },
-    { "id": "diablo-iv", "name": "Diablo IV", "religion": "Evet", "multiplayer": true, "players": "Co-op", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2023" },
-    { "id": "path-of-exile", "name": "Path of Exile", "religion": "Evet", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2013" },
-    { "id": "poe-2", "name": "Path of Exile 2", "religion": "Evet", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Bilinmiyor", "release": "2024 (beta)" },
-    { "id": "wow", "name": "World of Warcraft", "religion": "Evet", "multiplayer": true, "players": "MMO", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2004" },
-    { "id": "final-fantasy-xiv", "name": "Final Fantasy XIV", "religion": "Evet", "multiplayer": true, "players": "MMO", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2013 (ARR)" },
-    { "id": "star-wars-jedi-survivor", "name": "Star Wars Jedi: Survivor", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "18–25", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2023" },
-    { "id": "star-wars-outlaws", "name": "Star Wars Outlaws", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2024" },
-    { "id": "mgs3-delta", "name": "Metal Gear Solid Δ: Snake Eater", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "TBA" },
-    { "id": "resident-evil-4", "name": "Resident Evil 4 (Remake)", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "10–15", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2023" },
-    { "id": "resident-evil-village", "name": "Resident Evil Village", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "8–12", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2021" },
-    { "id": "alan-wake-2", "name": "Alan Wake 2", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "15–20", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2023" },
-    { "id": "control", "name": "Control", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "10–15", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2019" },
-    { "id": "portal-2", "name": "Portal 2", "religion": "Hayır", "multiplayer": true, "players": "Co-op 2", "mainStory": "8–10", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2011" },
-    { "id": "half-life-alyx", "name": "Half-Life: Alyx", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "10–12", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2020" },
-    { "id": "doom-eternal", "name": "DOOM Eternal", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "12–18", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2020" },
-    { "id": "sea-of-thieves", "name": "Sea of Thieves", "religion": "Hayır", "multiplayer": true, "players": "Co-op", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2018" },
-    { "id": "destiny-2", "name": "Destiny 2", "religion": "Evet", "multiplayer": true, "players": "Co-op", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2017" },
-    { "id": "no-mans-sky", "name": "No Man's Sky", "religion": "Hayır", "multiplayer": true, "players": "Co-op", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2016" },
-    { "id": "palworld", "name": "Palworld", "religion": "Hayır", "multiplayer": true, "players": "Co-op", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2024 (EA)" },
-    { "id": "helldivers-2", "name": "Helldivers 2", "religion": "Hayır", "multiplayer": true, "players": "4", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2024" },
-    { "id": "it-takes-two", "name": "It Takes Two", "religion": "Hayır", "multiplayer": true, "players": "2 (co-op)", "mainStory": "10–12", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2021" },
-    { "id": "uncharted-4", "name": "Uncharted 4: A Thief's End", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "12–15", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2016" },
-    { "id": "forza-horizon-5", "name": "Forza Horizon 5", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2021" },
-    { "id": "gran-turismo-7", "name": "Gran Turismo 7", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2022" },
-    { "id": "fifa-23", "name": "EA Sports FC 24", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2023" },
-    { "id": "nba-2k24", "name": "NBA 2K24", "religion": "Hayır", "multiplayer": true, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2023" },
-    { "id": "monster-hunter-world", "name": "Monster Hunter: World", "religion": "Hayır", "multiplayer": true, "players": "1–4", "mainStory": "30–50", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2018" },
-    { "id": "mh-wilds", "name": "Monster Hunter Wilds", "religion": "Hayır", "multiplayer": true, "players": "1–4", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Bilinmiyor", "release": "2025" },
-    { "id": "returnal", "name": "Returnal", "religion": "Hayır", "multiplayer": true, "players": "Co-op 2", "mainStory": "15–20", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2021/2023" },
-    { "id": "death-stranding", "name": "Death Stranding", "religion": "Hayır", "multiplayer": "Bilinmiyor", "players": "—", "mainStory": "35–45", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2019/2020" },
-    { "id": "death-stranding-2", "name": "Death Stranding 2: On the Beach", "religion": "Hayır", "multiplayer": "Bilinmiyor", "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Bilinmiyor", "release": "2025" },
-    { "id": "metaphor-refantazio", "name": "Metaphor: ReFantazio", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2024" },
-    { "id": "persona-5-royal", "name": "Persona 5 Royal", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "90+", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Evet", "release": "2019" },
-    { "id": "zelda-botw", "name": "The Legend of Zelda: Breath of the Wild", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "50+", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2017" },
-    { "id": "zelda-totk", "name": "The Legend of Zelda: Tears of the Kingdom", "religion": "Evet", "multiplayer": false, "players": "—", "mainStory": "50+", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2023" },
-    { "id": "animal-crossing-nh", "name": "Animal Crossing: New Horizons", "religion": "Hayır", "multiplayer": true, "players": "Co-op", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2020" },
-    { "id": "mario-kart-8", "name": "Mario Kart 8 Deluxe", "religion": "Hayır", "multiplayer": true, "players": "2–12", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2017" },
-    { "id": "splatoon-3", "name": "Splatoon 3", "religion": "Hayır", "multiplayer": true, "players": "4v4", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2022" },
-    { "id": "metroid-dread", "name": "Metroid Dread", "religion": "Hayır", "multiplayer": false, "players": "—", "mainStory": "8–12", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Hayır", "release": "2021" },
-    { "id": "valheim", "name": "Valheim", "religion": "Evet", "multiplayer": true, "players": "Co-op 2–10", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Kısmi", "release": "2021 (EA)" },
-    { "id": "satisfactory-2", "name": "Satisfactory 2", "religion": "Hayır", "multiplayer": true, "players": "Co-op", "mainStory": "—", "keyboardMouse": "Bilinmiyor", "crossPlatform": "Bilinmiyor", "release": "TBA" }
-  ]
-  </script>
 
-  <!-- ========== app.js (tüm etkileşimler) ========== -->
-  <script>
-    // ——— Bölüm: Veri yükleme ———
-    function readJsonBlock(){
-      try{
-        const raw = document.getElementById('local-games').textContent.trim();
-        const arr = JSON.parse(raw);
-        return Array.isArray(arr) ? arr : [];
-      }catch(e){ return []; }
-    }
-    let GAMES = readJsonBlock();
+<noscript class="p-4 text-center">Bu sayfa JavaScript gerektirir — lütfen tarayıcı ayarlarından JavaScript'i etkinleştirin.</noscript>
 
-    // ——— Bölüm: Eleman referansları ———
-    const searchForm = document.getElementById('searchForm');
-    const searchInput = document.getElementById('searchInput');
-    const suggestions = document.getElementById('suggestions');
-    const resultWrap = document.getElementById('resultWrap');
-    const notFound = document.getElementById('notFound');
-    const statusMsg = document.getElementById('statusMsg');
-    const aiMode = document.getElementById('aiMode');
 
-    const gameTitle = document.getElementById('gameTitle');
-    const fieldReligion = document.getElementById('fieldReligion');
-    const fieldMultiplayer = document.getElementById('fieldMultiplayer');
-    const fieldPlayers = document.getElementById('fieldPlayers');
-    const fieldMain = document.getElementById('fieldMain');
-    const fieldKM = document.getElementById('fieldKM');
-    const fieldCross = document.getElementById('fieldCross');
-    const fieldRelease = document.getElementById('fieldRelease');
-
-    const resultBadge = document.getElementById('resultBadge');
-    const sourceLink = document.getElementById('sourceLink');
-    const aiSources = document.getElementById('aiSources');
-
-    // ——— Bölüm: Yardımcılar ———
-    const escapeHtml = (s) => String(s)
-      .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;').replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
-
-    const valOr = (v, alt) => (v===undefined || v===null || String(v).trim()==='') ? alt : v;
-
-    const normalizeYesNo = (v) => {
-      if (typeof v === 'boolean') return v ? 'Evet' : 'Hayır';
-      if (typeof v === 'string') {
-        const t = v.trim().toLowerCase();
-        if (['evet','yes','true','1','var','supported','supports','full','partial'].includes(t)) return 'Evet';
-        if (['hayır','no','false','0','yok','not supported','unsupported'].includes(t)) return 'Hayır';
-      }
-      return 'Bilinmiyor';
-    };
-
-    // ——— Bölüm: Yerel arama/öneri ———
-    function findMatches(query) {
-      const q = query.trim().toLowerCase();
-      if (!q) return [];
-      return GAMES.filter(g => (g.name || '').toLowerCase().includes(q));
-    }
-    function findBest(query){
-      const q = query.trim().toLowerCase();
-      if (!q) return null;
-      const exact = GAMES.find(g => (g.name || '').toLowerCase() === q);
-      if (exact) return exact;
-      const starts = GAMES.find(g => (g.name || '').toLowerCase().startsWith(q));
-      if (starts) return starts;
-      const contains = GAMES.find(g => (g.name || '').toLowerCase().includes(q));
-      return contains || null;
-    }
-    function showSuggestions(items) {
-      if (!items.length) { suggestions.classList.add('hidden'); suggestions.innerHTML = ''; return; }
-      suggestions.innerHTML = `
-        <ul class="divide-y divide-black/5">
-          ${items.slice(0, 10).map(g => `
-            <li>
-              <button type="button" data-id="${g.id}" class="w-full text-left px-4 py-3 hover:bg-black/5 transition">
-                ${escapeHtml(g.name)}
-              </button>
-            </li>
-          `).join('')}
-        </ul>
-      `;
-      suggestions.classList.remove('hidden');
-      suggestions.querySelectorAll('button[data-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-id');
-          const game = GAMES.find(g => g.id === id);
-          if (game) {
-            searchInput.value = game.name;
-            suggestions.classList.add('hidden');
-            renderResult(game, 'local');
-          }
-        });
-      });
-    }
-
-    // ——— Bölüm: Sonuç göster ———
-    function renderResult(game, source='local', url='') {
-      if (!game) { resultWrap.classList.add('hidden'); notFound.classList.remove('hidden'); return; }
-      notFound.classList.add('hidden');
-
-      gameTitle.textContent = game.name || '—';
-      fieldReligion.textContent = valOr(game.religion,'Bilinmiyor');
-      const multiVal = normalizeYesNo(game.multiplayer);
-      fieldMultiplayer.textContent = multiVal;
-      fieldPlayers.textContent = (multiVal === 'Evet') ? (game.players || '—') : (multiVal === 'Bilinmiyor' ? 'Bilinmiyor' : '—');
-      fieldMain.textContent = valOr(game.mainStory,'—');
-      fieldKM.textContent = valOr(game.keyboardMouse,'Bilinmiyor');
-      fieldCross.textContent = valOr(game.crossPlatform,'Bilinmiyor');
-      fieldRelease.textContent = valOr(game.release,'—');
-
-      if (source === 'ai') {
-        resultBadge.textContent = 'AI (Oto)';
-        if (url) { sourceLink.href = url; sourceLink.classList.remove('hidden'); } else { sourceLink.classList.add('hidden'); }
-      } else {
-        resultBadge.textContent = 'Yerel';
-        sourceLink.classList.add('hidden');
-      }
-      resultWrap.classList.remove('hidden');
-    }
-
-    // ——— Bölüm: Kaynak rozetleri ———
-    const SOURCES = [
-      { key:'pcgw', label:'PCGamingWiki' },
-      { key:'wiki', label:'Wikipedia' }
-    ];
-    function initSourcePills(keys){
-      aiSources.innerHTML = '';
-      keys.forEach(k=>{
-        const s = SOURCES.find(x=>x.key===k);
-        const pill = document.createElement('span');
-        pill.dataset.key = k;
-        pill.className = 'px-2 py-1 rounded-full border border-white/15 bg-white/5';
-        pill.textContent = (s?.label||k) + ' • bekleniyor';
-        aiSources.appendChild(pill);
-      });
-      aiSources.classList.toggle('hidden', aiSources.childElementCount===0);
-    }
-    function updateSourcePill(key, state, url){
-      const pill = aiSources.querySelector(`[data-key="${key}"]`); if(!pill) return;
-      const label = SOURCES.find(x=>x.key===key)?.label || key;
-      if (state==='ok'){
-        pill.className = 'px-2 py-1 rounded-full border border-emerald-400/30 bg-emerald-500/10 text-emerald-200';
-        pill.innerHTML = url ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="underline decoration-dotted">${label}</a> • hazır` : `${label} • hazır`;
-      } else if (state==='fail'){
-        pill.className = 'px-2 py-1 rounded-full border border-rose-400/30 bg-rose-500/10 text-rose-200';
-        pill.textContent = `${label} • yok`;
-      } else {
-        pill.className = 'px-2 py-1 rounded-full border border-white/15 bg-white/5';
-        pill.textContent = `${label} • bekleniyor`;
-      }
-    }
-
-    // ——— Bölüm: PCGamingWiki ———
-    async function pcgwOpenSearch(name){
-      const sURL = `https://www.pcgamingwiki.com/w/api.php?action=opensearch&search=${encodeURIComponent(name)}&limit=1&format=json&origin=*`;
-      const r = await fetch(sURL);
-      if (!r.ok) return null;
-      const j = await r.json();
-      const title = j && j[1] && j[1][0];
-      const url   = j && j[3] && j[3][0];
-      return title ? { title, url } : null;
-    }
-    async function pcgwParseHTML(title){
-      const api = `https://www.pcgamingwiki.com/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=text&formatversion=2&format=json&origin=*`;
-      const r = await fetch(api);
-      if (!r.ok) throw new Error('parse fail');
-      const j = await r.json();
-      return j?.parse?.text || '';
-    }
-    function textFrom(html){
-      const div = document.createElement('div');
-      div.innerHTML = html || '';
-      return (div.textContent || '').replace(/\s+/g,' ').trim();
-    }
-    function findInfoboxRow(html, labels){
-      const div = document.createElement('div');
-      div.innerHTML = html || '';
-      const table = div.querySelector('table.infobox');
-      if (!table) return '';
-      const rows = table.querySelectorAll('tr');
-      for (const tr of rows){
-        const th = tr.querySelector('th,td');
-        if (!th) continue;
-        const t = th.textContent.trim().toLowerCase();
-        if (labels.some(lb => t.includes(lb))) {
-          const td = tr.querySelector('td') || tr.nextElementSibling?.querySelector?.('td');
-          if (!td) continue;
-          const txt = td.textContent.replace(/\s+/g,' ').trim();
-          if (txt) return txt;
-        }
-      }
-      return '';
-    }
-    function yesNoFrom(text){
-      const t = String(text||'').toLowerCase();
-      if (/(not supported|unsupported|hayır|no)\b/.test(t)) return 'Hayır';
-      if (/(supported|supports|evet|yes|available)\b/.test(t)) return 'Evet';
-      return 'Bilinmiyor';
-    }
-    function inferFromPCGW(html, pageUrl, fallbackName){
-      const full = textFrom(html).toLowerCase();
-      const modesTxt = findInfoboxRow(html, ['modes','mode','oyun modu']) || '';
-      const xplayTxt = findInfoboxRow(html, ['cross-platform','crossplay','cross-platform play']) || '';
-      const relTxt   = findInfoboxRow(html, ['release dates','release date','çıkarılış','çıkış']) || '';
-
-      const multiplayer =
-        (/multiplayer|co-?op|eşli/.test(modesTxt.toLowerCase()) || /multiplayer|co-?op|eşli/.test(full)) ? 'Evet'
-        : (/single[- ]?player|tek oyuncu/.test(modesTxt.toLowerCase()) ? 'Hayır' : 'Bilinmiyor');
-
-      let players = '—';
-      let m = full.match(/(\d{1,2})\s*(?:v|vs|x)\s*(\d{1,2})/);
-      if (m) players = `${m[1]}v${m[2]}`;
-      if (players==='—'){ m = full.match(/(\d{1,2})\s*(?:–|-|to)\s*(\d{1,2})\s*(players|oyuncu)?/); if (m) players = `${m[1]}–${m[2]}`; }
-      if (players==='—'){ m = full.match(/(?:up to|en fazla)\s*(\d{1,3})\s*(players|oyuncu)/); if (m) players = m[1]; }
-
-      const crossPlatform = xplayTxt ? yesNoFrom(xplayTxt) : (/cross[- ]?platform|crossplay/.test(full) ? 'Evet' : 'Bilinmiyor');
-      const religion = /(mytholog|mitoloji|tanrı|ilah|panteon|religion|church|deity)/.test(full) ? 'Evet' : 'Bilinmiyor';
-      const release = (relTxt || '').replace(/\s+/g,' ').trim() || '—';
-
-      return {
-        name: fallbackName,
-        religion,
-        multiplayer,
-        players,
-        mainStory: '—',
-        keyboardMouse: 'Bilinmiyor',
-        crossPlatform,
-        release,
-        _source: pageUrl || ''
-      };
-    }
-
-    // ——— Bölüm: Wikipedia ———
-    async function wikiSummarySmart(name){
-      const tryLang = async (lang) => {
-        const sURL = `https://${lang}.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(name)}&limit=1&namespace=0&format=json&origin=*`;
-        const s = await fetch(sURL);
-        if (!s.ok) return null;
-        const sj = await s.json();
-        const title = sj && sj[1] && sj[1][0];
-        if (!title) return null;
-
-        const url = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
-        const r = await fetch(url, { headers: { 'accept':'application/json' } });
-        if (!r.ok) return null;
-        const j = await r.json();
-        return { data: j, url: j?.content_urls?.desktop?.page || '' };
-      };
-      let pick = await tryLang('tr');
-      if (!pick) pick = await tryLang('en');
-      return pick;
-    }
-    function inferFromWiki(data, pageUrl, fallbackName){
-      const text = (data?.extract || '').toLowerCase();
-      const multiplayer = /multiplayer|co-?op|çok oyunculu|eşli/.test(text) ? 'Evet' : (/single[- ]?player|tek oyuncu/.test(text) ? 'Hayır' : 'Bilinmiyor');
-
-      let players = '—';
-      let m = text.match(/(\d{1,2})\s*(?:v|vs|x)\s*(\d{1,2})/);
-      if (m) players = `${m[1]}v${m[2]}`;
-      if (players==='—'){ m = text.match(/(\d{1,2})\s*(?:–|-|to)\s*(\d{1,2})\s*(players|oyuncu)?/); if (m) players = `${m[1]}–${m[2]}`; }
-      if (players==='—'){ m = text.match(/(?:up to|en fazla)\s*(\d{1,3})\s*(players|oyuncu)/); if (m) players = m[1]; }
-
-      let release = '—';
-      let r1 = text.match(/(?:released|çıkış|yayınlandı|çıkacaktır|release[sd]?)\D{0,12}(\d{4}(?:[-/\.]\d{1,2}(?:[-/\.]\d{1,2})?)?)/);
-      if (r1) release = r1[1];
-      let r2 = text.match(/(20\d{2})\s*q([1-4])/);
-      if (release==='—' && r2) release = `${r2[1]} Q${r2[2]}`;
-
-      const religion = /(mytholog|mitoloji|tanrı|ilah|panteon|religion|church|deity)/.test(text) ? 'Evet' : 'Bilinmiyor';
-      const crossPlatform = /(cross[- ]?platform|crossplay|platformlar arası)/.test(text) ? 'Evet' : 'Bilinmiyor';
-
-      return {
-        name: data?.title || fallbackName,
-        religion,
-        multiplayer,
-        players,
-        mainStory: '—',
-        keyboardMouse: 'Bilinmiyor',
-        crossPlatform,
-        release,
-        _source: pageUrl || ''
-      };
-    }
-
-    // ——— Bölüm: AI akışı ———
-    function initSources(){ initSourcePills(['pcgw','wiki']); }
-    async function autoSearch(name){
-      statusMsg.textContent = 'AI arama yapılıyor…';
-      statusMsg.classList.remove('hidden');
-      initSources();
-
-      const [pcgwData, wikiData] = await Promise.all([
-        (async ()=>{ try{ const p=await pcgwOpenSearch(name); if(!p){ updateSourcePill('pcgw','fail'); return null; } const html=await pcgwParseHTML(p.title); const d=inferFromPCGW(html,p.url,p.title||name); updateSourcePill('pcgw','ok', d._source); return d; }catch(e){ updateSourcePill('pcgw','fail'); return null; }})(),
-        (async ()=>{ try{ const w=await wikiSummarySmart(name); if(!w){ updateSourcePill('wiki','fail'); return null; } const d=inferFromWiki(w.data, w.url, name); updateSourcePill('wiki','ok', d._source); return d; }catch(e){ updateSourcePill('wiki','fail'); return null; }})()
-      ]);
-
-      // Birleştir: boş alanları tamamla
-      const base = { name, religion:'', multiplayer:'', players:'', mainStory:'', keyboardMouse:'', crossPlatform:'', release:'', _source:'' };
-      const merged = merge(base, [pcgwData, wikiData]);
-
-      renderResult(merged, 'ai', merged._source || '');
-      statusMsg.classList.add('hidden');
-    }
-    function merge(base, parts){
-      const out = { ...base };
-      const empty = v => v===undefined || v===null || String(v).trim()==='' || v==='—' || v==='Bilinmiyor';
-      const keys = ['religion','multiplayer','players','mainStory','keyboardMouse','crossPlatform','release','name','_source'];
-      for(const p of parts){
-        if(!p) continue;
-        for(const k of keys){
-          if (empty(out[k]) && !empty(p[k])) out[k]=p[k];
-        }
-      }
-      return out;
-    }
-
-    // ——— Bölüm: Etkileşimler ———
-    searchInput.addEventListener('input', () => {
-      const val = searchInput.value;
-      const matches = findMatches(val);
-      showSuggestions(matches);
-
-      const candidate = findBest(val);
-      if (candidate && matches.length === 1 && aiMode.value==='off') {
-        renderResult(candidate, 'local');
-      } else if (!val.trim()) {
-        resultWrap.classList.add('hidden');
-        notFound.classList.add('hidden');
-      }
-    });
-
-    searchForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      suggestions.classList.add('hidden');
-      const val = searchInput.value.trim();
-      if (!val) return;
-
-      const mode = aiMode.value;
-      if (mode === 'off') {
-        const local = findBest(val);
-        renderResult(local, 'local');
-        return;
-      }
-      // AI Otomatik
-      await autoSearch(val);
-    });
-
-    document.addEventListener('click', (e) => { if (!searchForm.contains(e.target)) suggestions.classList.add('hidden'); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') suggestions.classList.add('hidden'); });
-  </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9829e73b638f82b9',t:'MTc1ODQ2MTI4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<!-- Uygulama mantığı -->
+<script defer src="script.js"></script>
+</body>
 </html>
