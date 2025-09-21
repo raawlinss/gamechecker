@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rawlins · Oyun Arama (Demo)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Apple Color Emoji', 'Segoe UI Emoji'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-black text-white font-sans antialiased min-h-screen">
+  <!-- Üst yazı -->
+  <header class="w-full py-6 text-center">
+    <div class="text-white/90 tracking-[0.35em] uppercase text-sm sm:text-base font-semibold select-none">rawlins</div>
+  </header>
+
+  <!-- Orta alan -->
+  <main class="min-h-[calc(100vh-96px)] grid place-items-center px-4">
+    <div class="w-full max-w-2xl">
+      <!-- Arama -->
+      <form id="searchForm" class="relative">
+        <input
+          id="searchInput"
+          type="search"
+          autocomplete="off"
+          placeholder="Oyun ismi yazın…"
+          class="w-full h-14 sm:h-16 rounded-full bg-white text-black placeholder-black/50 px-6 pr-14 outline-none ring-0 focus:ring-4 focus:ring-white/20 transition shadow-[0_10px_30px_-10px_rgba(255,255,255,0.3)]"
+          aria-label="Oyun arama"
+        />
+        <button
+          type="submit"
+          class="absolute right-2 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-black text-white hover:bg-white hover:text-black transition grid place-items-center"
+          aria-label="Ara">
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+          </svg>
+        </button>
+
+        <!-- Öneriler -->
+        <div id="suggestions" class="hidden absolute left-0 right-0 mt-2 rounded-2xl bg-white text-black shadow-2xl overflow-hidden z-20">
+          <!-- JavaScript ile doldurulur -->
+        </div>
+      </form>
+
+      <!-- Sonuç kartı -->
+      <section id="resultWrap" class="hidden mt-6">
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 backdrop-blur">
+          <div class="flex items-center justify-between gap-3">
+            <h2 id="gameTitle" class="text-lg sm:text-xl font-semibold">Oyun</h2>
+            <span class="text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 text-white/80">Demo veri</span>
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
+              <div class="text-xs text-white/60 mb-1">Din/Mitoloji Teması</div>
+              <div id="fieldReligion" class="font-semibold">—</div>
+            </div>
+            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
+              <div class="text-xs text-white/60 mb-1">Çok Oyunculu</div>
+              <div id="fieldMultiplayer" class="font-semibold">—</div>
+            </div>
+            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
+              <div class="text-xs text-white/60 mb-1">Oyuncu Sayısı</div>
+              <div id="fieldPlayers" class="font-semibold">—</div>
+            </div>
+            <div class="rounded-xl bg-white/5 border border-white/10 p-3">
+              <div class="text-xs text-white/60 mb-1">Ana Hikâye (saat)</div>
+              <div id="fieldMain" class="font-semibold">—</div>
+            </div>
+          </div>
+
+          <p class="mt-4 text-xs text-white/50 leading-relaxed">
+            Not: Bu bir demo. Canlı internet taraması yapmaz; gömülü örnek veriyi gösterir.
+          </p>
+        </div>
+      </section>
+
+      <!-- Bulunamadı -->
+      <section id="notFound" class="hidden mt-6">
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 text-white/80">
+          Aradığınız oyun listede yok. Baş harflerini yazarak önerileri deneyin.
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Küçük, gömülü örnek oyun verisi (Demo)
+    const GAMES = [
+      { id: 'minecraft', name: 'Minecraft', religion: 'Hayır', multiplayer: true, players: 'Değişken (sunucuya bağlı)', mainStory: '—' },
+      { id: 'among-us', name: 'Among Us', religion: 'Hayır', multiplayer: true, players: '4–15', mainStory: '—' },
+      { id: 'fortnite', name: 'Fortnite', religion: 'Hayır', multiplayer: true, players: '100', mainStory: '—' },
+      { id: 'witcher3', name: 'The Witcher 3: Wild Hunt', religion: 'Evet', multiplayer: false, players: '—', mainStory: '50+' },
+      { id: 'elden-ring', name: 'Elden Ring', religion: 'Evet', multiplayer: true, players: '2–4 (eşli)', mainStory: '50+' },
+      { id: 'halo-infinite', name: 'Halo Infinite', religion: 'Hayır', multiplayer: true, players: '4–12', mainStory: '10–12' },
+      { id: 'stardew', name: 'Stardew Valley', religion: 'Hayır', multiplayer: true, players: '1–4', mainStory: '—' },
+      { id: 'lol', name: 'League of Legends', religion: 'Hayır', multiplayer: true, players: '10 (5v5)', mainStory: '—' },
+      { id: 'cs2', name: 'Counter-Strike 2', religion: 'Hayır', multiplayer: true, players: '10 (5v5)', mainStory: '—' },
+      { id: 'ow2', name: 'Overwatch 2', religion: 'Hayır', multiplayer: true, players: '10 (5v5)', mainStory: '—' },
+      { id: 'bg3', name: 'Baldur\'s Gate 3', religion: 'Evet', multiplayer: true, players: '1–4', mainStory: '75+' },
+      { id: 'gtav', name: 'Grand Theft Auto V', religion: 'Hayır', multiplayer: true, players: '30 (Online)', mainStory: '31–35' },
+    ];
+
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const suggestions = document.getElementById('suggestions');
+    const resultWrap = document.getElementById('resultWrap');
+    const notFound = document.getElementById('notFound');
+
+    const gameTitle = document.getElementById('gameTitle');
+    const fieldReligion = document.getElementById('fieldReligion');
+    const fieldMultiplayer = document.getElementById('fieldMultiplayer');
+    const fieldPlayers = document.getElementById('fieldPlayers');
+    const fieldMain = document.getElementById('fieldMain');
+
+    // Yardımcı: basit kaçış
+    const escapeHtml = (str) => String(str)
+      .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;').replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+
+    // Arama ve eşleştirme
+    function findMatches(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) return [];
+      return GAMES.filter(g => g.name.toLowerCase().includes(q));
+    }
+
+    function showSuggestions(items) {
+      if (!items.length) {
+        suggestions.classList.add('hidden');
+        suggestions.innerHTML = '';
+        return;
+      }
+      suggestions.innerHTML = `
+        <ul class="divide-y divide-black/5">
+          ${items.slice(0, 8).map(g => `
+            <li>
+              <button type="button" data-id="${g.id}" class="w-full text-left px-4 py-3 hover:bg-black/5 transition">
+                ${escapeHtml(g.name)}
+              </button>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+      suggestions.classList.remove('hidden');
+
+      // Tıklama: inputu doldur ve sonucu göster
+      suggestions.querySelectorAll('button[data-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          const game = GAMES.find(g => g.id === id);
+          if (game) {
+            searchInput.value = game.name;
+            suggestions.classList.add('hidden');
+            renderResult(game);
+          }
+        });
+      });
+    }
+
+    function renderResult(game) {
+      if (!game) {
+        resultWrap.classList.add('hidden');
+        notFound.classList.remove('hidden');
+        return;
+      }
+      notFound.classList.add('hidden');
+      gameTitle.textContent = game.name;
+      fieldReligion.textContent = game.religion || 'Bilinmiyor';
+      fieldMultiplayer.textContent = game.multiplayer ? 'Evet' : 'Hayır';
+      fieldPlayers.textContent = game.multiplayer ? (game.players || '—') : '—';
+      fieldMain.textContent = game.mainStory || '—';
+      resultWrap.classList.remove('hidden');
+    }
+
+    function findBest(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) return null;
+      // 1) Tam eşleşme
+      let exact = GAMES.find(g => g.name.toLowerCase() === q);
+      if (exact) return exact;
+      // 2) Başlangıç eşleşmesi
+      let starts = GAMES.filter(g => g.name.toLowerCase().startsWith(q));
+      if (starts.length === 1) return starts[0];
+      if (starts.length > 1) return starts[0];
+      // 3) İçeren ilk
+      let contains = GAMES.filter(g => g.name.toLowerCase().includes(q));
+      return contains[0] || null;
+    }
+
+    // Input: yazdıkça öneri + tek eşleşmede otomatik gösterim
+    searchInput.addEventListener('input', () => {
+      const val = searchInput.value;
+      const matches = findMatches(val);
+      showSuggestions(matches);
+
+      // Otomatik algılama: tek güçlü eşleşme varsa sonucu göster
+      const candidate = findBest(val);
+      if (candidate && matches.length === 1) {
+        renderResult(candidate);
+      } else if (!val.trim()) {
+        resultWrap.classList.add('hidden');
+        notFound.classList.add('hidden');
+      }
+    });
+
+    // Gönder: en iyi eşleşmeyi göster
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      suggestions.classList.add('hidden');
+      const val = searchInput.value;
+      const game = findBest(val);
+      renderResult(game);
+    });
+
+    // Dışarı tıklayınca öneriyi kapat
+    document.addEventListener('click', (e) => {
+      if (!searchForm.contains(e.target)) {
+        suggestions.classList.add('hidden');
+      }
+    });
+
+    // Klavye: Esc -> öneri kapat
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') suggestions.classList.add('hidden');
+    });
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9829464b30c80cf7',t:'MTc1ODQ1NDY4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
