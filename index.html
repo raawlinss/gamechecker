@@ -66,7 +66,7 @@
 
   <script>
     // *** BU KISMI DÜZENLE: API anahtarını buraya yapıştır ***
-    const API_KEY = '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'; // Buraya kendi API anahtarını yaz
+    const API_KEY = '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'; // Buraya kendi API anahtarını yaz
     
     const elInput = document.getElementById('search');
     const elResults = document.getElementById('results');
@@ -106,7 +106,7 @@ Eğer oyun bulunamazsa sadece "OYUN BULUNAMADI" yaz.`;
             'X-Title': 'Rawlins Game Search'
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.0-flash-exp:free',
+            model: 'deepseek/deepseek-chat-v3.1:free',
             messages: [{
               role: 'user',
               content: prompt
@@ -296,5 +296,5 @@ Eğer oyun bulunamazsa sadece "OYUN BULUNAMADI" yaz.`;
       }
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'989f22a9337d805b',t:'MTc1OTY5MDU0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'989f27005310805b',t:'MTc1OTY5MDcyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
