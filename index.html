@@ -25,6 +25,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="min-h-screen bg-black text-white font-sans">
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+  </style>
+  
   <main class="min-h-screen w-full flex items-center justify-center p-6">
     <section class="w-full max-w-2xl">
       <h1 class="text-white/90 tracking-[0.35em] uppercase text-sm sm:text-base font-semibold select-none text-center">
@@ -52,13 +58,239 @@
           />
         </div>
       </div>
-    
 
       <!-- Sonuçlar -->
       <div id="results" class="mt-8 space-y-4"></div>
     </section>
   </main>
 
-   <script src="script.js"></script>
-</body>
+  <script>
+    // *** BU KISMI DÜZENLE: API anahtarını buraya yapıştır ***
+    const API_KEY = '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'; // Buraya kendi API anahtarını yaz
+    
+    const elInput = document.getElementById('search');
+    const elResults = document.getElementById('results');
+    let currentRequest = null; // Önceki isteği iptal etmek için
+
+    // DeepSeek API'den oyun bilgisi çek
+    async function fetchGameInfo(gameName) {
+      try {
+        // Önceki isteği iptal et
+        if (currentRequest) {
+          currentRequest.abort();
+        }
+
+        // Yeni istek oluştur
+        const controller = new AbortController();
+        currentRequest = controller;
+
+        const prompt = `"${gameName}" oyunu hakkında şu bilgileri ver (sadece bu format):
+        
+Ad: [Oyun adı]
+Din var mı: [Evet/Hayır/Belirsiz - kısa açıklama]
+Çok oyunculu mu: [Evet/Hayır - kısa açıklama]
+Custom Server kurma: [Evet/Hayır/Kısmen - kısa açıklama]
+Kaç kişilik: [Oyuncu sayısı bilgisi]
+Ne zaman çıktı: [Çıkış tarihi]
+Cross platform: [Evet/Hayır/Kısmen - hangi platformlar]
+Kaç saatte biter: [Tamamlama süresi]
+
+Eğer oyun bulunamazsa sadece "OYUN BULUNAMADI" yaz.`;
+
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': window.location.origin,
+            'X-Title': 'Rawlins Game Search'
+          },
+          body: JSON.stringify({
+            model: 'deepseek/deepseek-chat-v3.1:free',
+            messages: [{
+              role: 'user',
+              content: prompt
+            }],
+            max_tokens: 500,
+            temperature: 0.1
+          }),
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(`API Hatası: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content;
+        
+        if (!content || content.includes('OYUN BULUNAMADI')) {
+          return null;
+        }
+
+        return parseGameInfo(content, gameName);
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          return null; // İptal edildi, sessizce geç
+        }
+        console.error('API Hatası:', error);
+        throw error;
+      }
+    }
+
+    // API yanıtını parse et
+    function parseGameInfo(content, originalName) {
+      const lines = content.split('\n').filter(line => line.trim());
+      const info = { id: originalName.toLowerCase().replace(/\s+/g, '-') };
+      
+      lines.forEach(line => {
+        const [key, ...valueParts] = line.split(':');
+        const value = valueParts.join(':').trim();
+        
+        if (key && value) {
+          const cleanKey = key.trim().toLowerCase();
+          if (cleanKey.includes('ad')) info.ad = value;
+          else if (cleanKey.includes('din')) info.din = value;
+          else if (cleanKey.includes('çok oyunculu')) info.cokOyunculu = value;
+          else if (cleanKey.includes('custom') || cleanKey.includes('server')) info.customServer = value;
+          else if (cleanKey.includes('kişilik') || cleanKey.includes('kişi')) info.kisisayisi = value;
+          else if (cleanKey.includes('çıktı') || cleanKey.includes('tarih')) info.cikis = value;
+          else if (cleanKey.includes('cross') || cleanKey.includes('platform')) info.cross = value;
+          else if (cleanKey.includes('biter') || cleanKey.includes('saat')) info.bitisSuresi = value;
+        }
+      });
+
+      // Eksik alanları doldur
+      if (!info.ad) info.ad = originalName;
+      Object.keys(info).forEach(key => {
+        if (!info[key] && key !== 'id') info[key] = 'Bilgi bulunamadı';
+      });
+
+      return info;
+    }
+
+    // Kart oluşturucu
+    function renderCard(item) {
+      const card = document.createElement('article');
+      card.className = 'rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur-sm hover:bg-white/10 transition-colors';
+      card.setAttribute('data-id', item.id);
+
+      const title = document.createElement('h3');
+      title.className = 'text-white font-semibold text-lg';
+      title.textContent = item.ad;
+
+      const grid = document.createElement('div');
+      grid.className = 'mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-white/90';
+
+      const row = (label, value) => {
+        const r = document.createElement('div');
+        r.className = 'flex items-center justify-between gap-3 bg-white/5 rounded-lg px-3 py-2 border border-white/10';
+        const l = document.createElement('span');
+        l.className = 'text-white/60';
+        l.textContent = label;
+        const v = document.createElement('span');
+        v.className = 'font-medium text-white';
+        v.textContent = value;
+        r.append(l, v);
+        return r;
+      };
+
+      grid.append(
+        row('Din var mı?', item.din),
+        row('Çok oyunculu mu?', item.cokOyunculu),
+        row('Custom Server kurma?', item.customServer),
+        row('Kaç kişilik?', item.kisisayisi),
+        row('Ne zaman çıktı?', item.cikis),
+        row('Cross platform?', item.cross),
+        row('Kaç saatte biter?', item.bitisSuresi),
+      );
+
+      card.append(title, grid);
+      return card;
+    }
+
+    // Yükleme göstergesi
+    function showLoading() {
+      elResults.innerHTML = `
+        <div class="flex items-center justify-center py-8">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          <span class="ml-3 text-white/60">Oyun bilgileri getiriliyor...</span>
+        </div>
+      `;
+    }
+
+    // Hata göstergesi
+    function showError(message) {
+      elResults.innerHTML = `
+        <div class="text-center py-8">
+          <div class="text-red-400 mb-2">⚠️ Hata</div>
+          <div class="text-white/60 text-sm">${message}</div>
+        </div>
+      `;
+    }
+
+    // Sonuç göster
+    function render(list) {
+      elResults.innerHTML = '';
+      if (!list.length) {
+        const empty = document.createElement('div');
+        empty.className = 'text-white/60 text-center py-8';
+        empty.textContent = 'Hiç sonuç bulunamadı';
+        elResults.appendChild(empty);
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      list.forEach(item => frag.appendChild(renderCard(item)));
+      elResults.appendChild(frag);
+    }
+
+    // Ana arama fonksiyonu
+    async function search(query) {
+      const term = query.trim();
+      if (!term) {
+        elResults.innerHTML = '';
+        return;
+      }
+
+      if (!API_KEY || API_KEY.includes('BURAYA')) {
+        showError('API anahtarı ayarlanmamış. Lütfen kodda API_KEY değişkenini düzenleyin.');
+        return;
+      }
+
+      showLoading();
+
+      try {
+        const gameInfo = await fetchGameInfo(term);
+        if (gameInfo) {
+          render([gameInfo]);
+        } else {
+          // Oyun bulunamadığında da yükleme ekranını göster
+          showLoading();
+        }
+      } catch (error) {
+        showError('API bağlantısında sorun oluştu. Lütfen tekrar deneyin.');
+      }
+    }
+
+    // Debounce fonksiyonu (çok hızlı aramayı önler)
+    let searchTimeout;
+    function debouncedSearch(query) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => search(query), 800);
+    }
+
+    // Event listeners
+    elInput.addEventListener('input', (e) => {
+      debouncedSearch(e.target.value);
+    });
+
+    elInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        clearTimeout(searchTimeout);
+        search(e.target.value);
+      }
+    });
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'989eae26a152805b',t:'MTc1OTY4NTc3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
