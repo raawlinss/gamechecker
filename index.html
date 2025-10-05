@@ -66,7 +66,7 @@
 
   <script>
     // *** BU KISMI DÜZENLE: API anahtarını buraya yapıştır ***
-    const API_KEY = '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'; // Buraya kendi API anahtarını yaz
+    const API_KEY = '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'; // Buraya kendi API anahtarını yaz
     
     const elInput = document.getElementById('search');
     const elResults = document.getElementById('results');
@@ -264,8 +264,12 @@ Eğer oyun bulunamazsa sadece "OYUN BULUNAMADI" yaz.`;
         if (gameInfo) {
           render([gameInfo]);
         } else {
-          // Oyun bulunamadığında da yükleme ekranını göster
-          showLoading();
+          elResults.innerHTML = `
+            <div class="text-center py-8">
+              <div class="text-white/60">"${term}" oyunu aranıyor...</div>
+              <div class="text-white/40 text-sm mt-2">Lütfen bekleyin</div>
+            </div>
+          `;
         }
       } catch (error) {
         showError('API bağlantısında sorun oluştu. Lütfen tekrar deneyin.');
@@ -292,5 +296,5 @@ Eğer oyun bulunamazsa sadece "OYUN BULUNAMADI" yaz.`;
       }
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'989eae26a152805b',t:'MTc1OTY4NTc3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'989eb9d1e07e9938',t:'MTc1OTY4NjI1NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
