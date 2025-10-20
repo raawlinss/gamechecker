@@ -66,7 +66,7 @@
 
   <script>
     // *** BU KISMI DÜZENLE: API anahtarını buraya yapıştır ***
-    const API_KEY = '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'; // Buraya kendi API anahtarını yaz
+    const API_KEY = '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'; // Buraya kendi API anahtarını yaz
     
     const elInput = document.getElementById('search');
     const elResults = document.getElementById('results');
@@ -106,7 +106,7 @@ Eğer oyun bulunamazsa sadece "OYUN BULUNAMADI" yaz.`;
             'X-Title': 'Rawlins Game Search'
           },
           body: JSON.stringify({
-            model: 'deepseek/deepseek-chat-v3.1:free',
+            model: 'google/gemini-2.0-flash-exp:free',
             messages: [{
               role: 'user',
               content: prompt
